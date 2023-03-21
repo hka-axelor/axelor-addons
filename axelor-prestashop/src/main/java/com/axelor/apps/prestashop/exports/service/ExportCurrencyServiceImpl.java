@@ -24,6 +24,7 @@ import com.axelor.apps.base.service.CurrencyService;
 import com.axelor.apps.base.service.administration.AbstractBatch;
 import com.axelor.apps.prestashop.entities.PrestashopCurrency;
 import com.axelor.apps.prestashop.entities.PrestashopResourceType;
+import com.axelor.apps.prestashop.entities.PrestashopTranslatableString;
 import com.axelor.apps.prestashop.service.library.PSWebServiceClient;
 import com.axelor.apps.prestashop.service.library.PrestaShopWebserviceException;
 import com.axelor.exception.AxelorException;
@@ -128,6 +129,24 @@ public class ExportCurrencyServiceImpl implements ExportCurrencyService {
         if (remoteCurrency.getId() == null
             || appConfig.getPrestaShopMasterForCurrencies() == Boolean.FALSE) {
           remoteCurrency.setName(localCurrency.getName());
+
+          // Setting translatable fields
+          PrestashopTranslatableString str = remoteCurrencies.get(0).getNames().clone();
+          str.clearTranslations(remoteCurrency.getName());
+          remoteCurrency.setNames(str);
+
+          // Setting empty patterns (Need to update this code if required)
+          PrestashopTranslatableString pattern = remoteCurrencies.get(0).getPattern().clone();
+          pattern.clearTranslations("");
+          remoteCurrency.setPattern(pattern);
+
+          // Setting empty numeric ISO code (Need to update this code if required)
+          remoteCurrency.setNumericIsoCode("");
+
+          PrestashopTranslatableString symbol = remoteCurrencies.get(0).getSymbol().clone();
+          symbol.clearTranslations(localCurrency.getSymbol());
+          remoteCurrency.setSymbol(symbol);
+
           // TODO Add an option
           try {
             remoteCurrency.setConversionRate(
